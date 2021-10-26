@@ -11,9 +11,30 @@ def go_straight(speed):
     client.publish("tag/networktest", send)
     print(f'published message: {send}')
 
+def stop():
+    send = 'MoveTank 0 0'
+    client.publish("tag/networktest", send)
+    print(f'published message: {send}')
+
 def go_straight_timed(speed, duration):
     # start by going forward
     send = f'MoveTank {speed} {speed}'
+    client.publish("tag/networktest", send)
+    print(f'published message: {send}')
+    # pause for {duration}, then set speed to 0 to brake
+    time.sleep(duration)
+    send = 'MoveTank 0 0' 
+    client.publish("tag/networktest", send)
+    print(f'published message: {send}')
+
+def move_bispeed(left_speed, right_speed):
+    send = f'MoveTank {left_speed} {right_speed}'
+    client.publish("tag/networktest", send)
+    print(f'published message: {send}')
+
+def move_bispeed_timed(left_speed, right_speed, duration):
+    # start by moving
+    send = f'MoveTank {left_speed} {right_speed}'
     client.publish("tag/networktest", send)
     print(f'published message: {send}')
     # pause for {duration}, then set speed to 0 to brake
