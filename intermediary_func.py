@@ -8,7 +8,7 @@ count = 0
 def on_connect(client, userdata, flags, rc):
     global logger
     print("Connected with result code " + str(rc))
-    client.subscribe("tag/networktest")
+    #client.subscribe("tag/networktest")
     client.subscribe("tag/insight_dat")
 
 def on_message(client, userdata, msg):
@@ -33,7 +33,8 @@ def on_message(client, userdata, msg):
     print(f'published message: {send}')
 
     with open("log.txt", 'a') as file:
-        file.write(str(datetime.datetime.now()) + " " + str(data) + "\n")
+        file.write(str(datetime.datetime.now()) + " " + str(data) + "\n" + 
+        str(datetime.datetime.now()) + str(send))
 
 
 client = mqtt.Client( protocol=mqtt.MQTTv311,transport="websockets")

@@ -153,7 +153,7 @@ class Subcribe():
         """
         data = kwargs.get('data')
         print('pm data: {}'.format(data))
-        client.publish("tag/insight_dat", data)
+        client.publish("tag/insight_dat", str(data))
 
     def on_new_pow_data(self, *args, **kwargs):
         """

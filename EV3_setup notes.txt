@@ -1,0 +1,12 @@
+1. Connect pc and EV3 to same wifi/hotspot
+
+2. Open terminal on pc, type "ssh robot@ev3dev.local".  Default password is "maker"
+
+3. "cd mqttws-ev3"
+	3b. IF NECESSARY, update the MQTT broker and port; "vim subscribe.py" or "nano subscribe.py"
+
+4. "python3 subscribe.py"
+
+5. cntrl + C to end python script
+
+6. cntrl + D to logout/exit SSH
