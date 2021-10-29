@@ -1,5 +1,9 @@
 import paho.mqtt.client as mqtt
 import datetime
+import sender_functions_TB as move
+
+
+count = 0
 
 def on_connect(client, userdata, flags, rc):
     global logger
@@ -8,10 +12,23 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("tag/insight_dat")
 
 def on_message(client, userdata, msg):
+    global count
     data = msg.payload.decode()
     print(f'message recieved: {data}')
     
-    send = 'sending function to ev3'
+    if count == 0:
+        send = move.go_straight(15)
+        count += 1
+    elif count == 1:
+        send = move.stop()
+        count += 1
+    elif count == 2:
+        send = move.go_straight(-15)
+        count += 1
+    else:
+        send = move.stop()
+        count = 0
+
     client.publish("tag/networktest", send)
     print(f'published message: {send}')
 
