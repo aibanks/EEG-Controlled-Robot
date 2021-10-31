@@ -21,7 +21,7 @@ class DataProcessing():
         if self.messageCount > 1:
             rel_previous, rel_current = self.data['rel'][self.messageCount-2:]
             delta = rel_current - rel_previous
-            speed_change = delta * 100  # 100 to convert from decimals on EEG to 0-100 scale for speed. Second value: test different values to scale the change
+            speed_change = round(delta * 100)  # 100 to convert from decimals on EEG to 0-100 scale for speed. Second value: test different values to scale the change
             text = f'Relaxation changed from {rel_previous} to {rel_current}. Updating speed from {self.speed} to '
             self.speed += speed_change
             text += f'{self.speed}.'
