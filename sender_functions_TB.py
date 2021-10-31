@@ -10,6 +10,7 @@ def go_straight(speed):
     send = f'MoveTank {speed} {speed}'
     client.publish("tag/networktest", send)
     print(f'published message: {send}')
+    return send  #may need to add this line to the other functions below
 
 def stop():
     send = 'MoveTank 0 0'
