@@ -124,19 +124,17 @@ def reconnect():
 def convert_to_json(sample):
     stream_type = sample.split()[0]
     if stream_type == "E4_Acc":
-        new_timestamp = datetime.fromtimestamp(float(sample.split()[1])).isoformat(sep=' ', timespec='milliseconds') #recent update to include milliseconds
+        #new_timestamp = datetime.fromtimestamp(float(sample.split()[1])).isoformat(sep=' ', timespec='milliseconds') #recent update to include milliseconds
         new_timestamp_unix = sample.split()[1] #recent update to include unix timestamp to make querying easier
         new_data = [int(sample.split()[2].replace(',','.')), int(sample.split()[3].replace(',','.')), int(sample.split()[4].replace(',','.'))]
-        
         sample_json = {"stream_type": stream_type, "Data": [new_timestamp_unix, new_data[0], new_data[1], new_data[2]]}
-
-        sample_json = json.dumps(sample_json)    #might have issues from trying to batch more than 1 json at a time later in the code
+        #sample_json = json.dumps(sample_json)
     else:
-        new_timestamp = datetime.fromtimestamp(float(sample.split()[1])).isoformat(sep=' ', timespec='milliseconds') #recent update to include milliseconds
+        #new_timestamp = datetime.fromtimestamp(float(sample.split()[1])).isoformat(sep=' ', timespec='milliseconds') #recent update to include milliseconds
         new_timestamp_unix = sample.split()[1] #recent update to include unix timestamp to make querying easier
         new_data = float(sample.split()[2])
-        sample_json = {"stream_type" : stream_type, "Value" : new_data, "dateTime" : new_timestamp, "dateTime_Unix" : new_timestamp_unix}
-        sample_json = json.dumps(sample_json)
+        sample_json = {"stream_type" : stream_type, "Data" : [new_timestamp_unix, new_data]}
+        #sample_json = json.dumps(sample_json)
     return(sample_json)
 
 
@@ -154,7 +152,7 @@ try:
         data=[]
         samples = response.split("\r\n")
         for sample in samples:
-            if sample[0:2] == "E4" and len(sample.split()) >= 3:
+            if sample[0:2] == "E4" and len(sample.split()) >= 3:  #confirms the sample is complete
                 sample_json = convert_to_json(sample)
                 #print(sample_json)
                 data.append(sample_json)
@@ -162,6 +160,7 @@ try:
         print(data)
         client.publish("tag/E4_dat", str(data))
         #print("Data streaming in progress")
+        time.sleep(1)
 except KeyboardInterrupt:
     print('interrupted!')
     disconnect()
