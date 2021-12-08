@@ -30,7 +30,7 @@ def on_message(client, userdata, msg):
         count = 0
 
     client.publish("tag/networktest", send)
-    print(f'published message: {send}')
+    #print(f'published message: {send}')
 
     with open("log.txt", 'a') as file:
         file.write(str(datetime.datetime.now()) + " " + str(data) + "\n" + 

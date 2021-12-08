@@ -36,7 +36,7 @@ serverAddress = '127.0.0.1'
 serverPort = 28000
 bufferSize = 4096
 
-#deviceID = 'CDCB11' # 'A03003'
+deviceID = 'CDCB11' # 'A03003'
 
 def connect(deviceID):
     global s
@@ -64,9 +64,9 @@ def connect(deviceID):
     print(response.decode("utf-8"))
 
     return connection_response
-connect()
+connect(deviceID)
 
-#time.sleep(1)
+time.sleep(1)
 
 def subscribe_to_data():
     global acc, bvp, gsr, tmp, ibi, bat, tag
@@ -121,16 +121,15 @@ def reconnect():
     connect()
     subscribe_to_data()  
 
-def convert_to_json(sample, participant, participant_ID, session_ID):
+def convert_to_json(sample):
     stream_type = sample.split()[0]
     if stream_type == "E4_Acc":
         new_timestamp = datetime.fromtimestamp(float(sample.split()[1])).isoformat(sep=' ', timespec='milliseconds') #recent update to include milliseconds
         new_timestamp_unix = sample.split()[1] #recent update to include unix timestamp to make querying easier
         new_data = [int(sample.split()[2].replace(',','.')), int(sample.split()[3].replace(',','.')), int(sample.split()[4].replace(',','.'))]
-        sample_jsonX = {"stream_type" : "E4_Acc_X", "Value" : new_data[0], "dateTime" : new_timestamp, "dateTime_Unix" : new_timestamp_unix}
-        sample_jsonY = {"stream_type" : "E4_Acc_Y", "Value" : new_data[1], "dateTime" : new_timestamp, "dateTime_Unix" : new_timestamp_unix}
-        sample_jsonZ = {"stream_type" : "E4_Acc_Z", "Value" : new_data[2], "dateTime" : new_timestamp, "dateTime_Unix" : new_timestamp_unix}
-        sample_json = [sample_jsonX, sample_jsonY, sample_jsonZ]
+        
+        sample_json = {"stream_type": stream_type, "Data": [new_timestamp_unix, new_data[0], new_data[1], new_data[2]]}
+
         sample_json = json.dumps(sample_json)    #might have issues from trying to batch more than 1 json at a time later in the code
     else:
         new_timestamp = datetime.fromtimestamp(float(sample.split()[1])).isoformat(sep=' ', timespec='milliseconds') #recent update to include milliseconds
@@ -142,26 +141,30 @@ def convert_to_json(sample, participant, participant_ID, session_ID):
 
 
 
-def stream(participant, participant_ID, session_ID):
-    response = s.recv(bufferSize).decode("utf-8")
-    #print(response)
-    #print('Data streaming in progress')
-    if "connection lost to device" in response:
-        print(response.decode("utf-8"))
-        reconnect()
-    #samples = response.split("\r\n")
-    #print(samples)
-    data=[]
-    samples = response.split("\r\n")
-    for sample in samples:
-        if sample[0:2] == "E4" and len(sample.split()) >= 3:
-            sample_json = convert_to_json(sample, participant, participant_ID, session_ID)
-            #print(sample_json)
-            data.append(sample_json)
-    #client.send_batch(event_data_batch)
-    print(data)
-    client.publish("tag/E4_dat", str(data))
-    #print("Data streaming in progress")
+try:
+    while True:
+        response = s.recv(bufferSize).decode("utf-8")
+        #print(response)
+        #print('Data streaming in progress')
+        if "connection lost to device" in response:
+            print(response.decode("utf-8"))
+            reconnect()
+        #samples = response.split("\r\n")
+        #print(samples)
+        data=[]
+        samples = response.split("\r\n")
+        for sample in samples:
+            if sample[0:2] == "E4" and len(sample.split()) >= 3:
+                sample_json = convert_to_json(sample)
+                #print(sample_json)
+                data.append(sample_json)
+        #client.send_batch(event_data_batch)
+        print(data)
+        client.publish("tag/E4_dat", str(data))
+        #print("Data streaming in progress")
+except KeyboardInterrupt:
+    print('interrupted!')
+    disconnect()
 
 def unsubscribe_to_data():
     global acc, bvp, gsr, tmp, ibi, bat, tag
