@@ -160,7 +160,7 @@ try:
         print(data)
         client.publish("tag/E4_dat", str(data))
         #print("Data streaming in progress")
-        time.sleep(1)
+        time.sleep(3)
 except KeyboardInterrupt:
     print('interrupted!')
     disconnect()
