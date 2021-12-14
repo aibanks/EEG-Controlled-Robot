@@ -44,6 +44,8 @@ class DataProcessing():
             if rel_current > 0.6:
                 command = move.spin_timed(80, 2, clockwise=True)
                 return command
+            if rel_current < 0.4:
+                command = move.spin_timed(80, 2, clockwise=False)
       
         elif self.message_source == 'E4':   # Last message recieved was from the E4
             if self.E4messageCount > 1:
