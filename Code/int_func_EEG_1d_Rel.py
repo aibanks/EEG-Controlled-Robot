@@ -4,6 +4,7 @@ import sender_functions_TB as move
 import numpy as np
 import pandas as pd
 import ast
+import time
 
 
 class DataProcessing():
@@ -12,6 +13,7 @@ class DataProcessing():
                                             "rel.isActive","rel","int.isActive","int","foc.isActive","foc"])
         self.messageCount = 0
         self.speed = 0
+        self.time_init = time.time()
 
     def updateDataFrame(self, new_dat):
         dat_unpacked = [new_dat["time"]] + new_dat["met"]
@@ -27,6 +29,9 @@ class DataProcessing():
             text += f'{self.speed}.'
             print(text)
             command = move.go_straight(self.speed)
+            with open(f'dat_{self.time_init}.csv', "w") as f:
+                self.data.to_csv(f, header= True, index=False)
+
         else:
             command = 'Not enough data, no command sent'
             print(command)
